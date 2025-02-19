@@ -19,9 +19,10 @@ const get_image_results = async (imagePath) => {
     const headers = { 'accept': 'application/json', 'Authorization': APITOKEN }
     const formData = new FormData()
     formData.append('images', fs.createReadStream(imagePath))
+    formData.append('id_search', '')
 
     try {
-        const response = await axios.post(`${site}/api/upload_pic`, formData, { headers })
+        const response = await axios.post(`${site}/api/upload_pic`, formData, { ...formData.getHeaders(), headers })
         if (response.data.error) {
             return { error: `${response.data.error} (${response.data.code})`, results: null }
         }
@@ -94,8 +95,8 @@ const filter_results = (results) => {
         twitter: /x\.com\/([a-zA-Z0-9_-]+)/
     }
 
-    results.forEach(img => {
-        const { score, url } = img
+    for (let i = 0; i < results.length; i++) {
+        const { score, url } = results[i]
         if (score > scoreThreshold) {
             let matched = false
 
@@ -135,7 +136,7 @@ const filter_results = (results) => {
                 otherUsernames.push({ url, username: url, score })
             }
         }
-    })
+    }
 
     return {
         instagramUsernames,
