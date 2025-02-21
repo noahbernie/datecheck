@@ -28,7 +28,6 @@ const get_image_results = async (imagePath) => {
         }
 
         const id_search = response.data.id_search
-        console.log(`${response.data.message} id_search=${id_search}`)
 
         const json_data = { id_search, with_progress: true, status_only: false, demo: TESTING_MODE }
 
@@ -95,8 +94,9 @@ const filter_results = (results) => {
         twitter: /x\.com\/([a-zA-Z0-9_-]+)/
     }
 
-    for (let i = 0; i < results.length; i++) {
-        const { score, url } = results[i]
+    const resultData = results.results
+    for (let i = 0; i < resultData.length; i++) {
+        const { score, url } = resultData[i]
         if (score > scoreThreshold) {
             let matched = false
 
@@ -244,7 +244,7 @@ const editDistance = (str1, str2) => {
     return costs[str2.length]
 }
 
-const prepare_display_data = async (instagramUsernamesWithScores, linkedinUsernamesWithScores, twitterUsernamesWithScores, facebookUsernamesWithScores, otherUsernamesWithScores) => {
+const prepare_display_data = (instagramUsernamesWithScores, linkedinUsernamesWithScores, twitterUsernamesWithScores, facebookUsernamesWithScores, otherUsernamesWithScores) => {
     const baseUrls = {
         instagram: 'https://instagram.com/',
         linkedin: 'https://linkedin.com/in/',
@@ -252,51 +252,53 @@ const prepare_display_data = async (instagramUsernamesWithScores, linkedinUserna
         facebook: 'https://facebook.com/'
     }
 
-    const fetchProfilePhoto = async (url) => {
+    const fetchProfilePhoto = (url) => {
         const placeholderImage = "https://via.placeholder.com/150"
-        try {
-            const response = await axios.get(url, { timeout: 5000 })
-            if (response.status === 200) {
-                return url // Assume URL is valid for now
-            }
-        } catch (e) {
-            console.error(`Error fetching profile photo: ${e}`)
-        }
-        return placeholderImage
+        return axios.get(url, { timeout: 5000 })
+            .then(response => {
+                if (response.status === 200) {
+                    return url // Assume URL is valid for now
+                }
+            })
+            .catch(e => {
+                console.error(`Error fetching profile photo: ${e}`)
+                return placeholderImage
+            })
     }
 
-    const prepareEntries = async (usernamesWithScores, platform) => {
-        const platformData = []
-        for (const { url, username, score } of usernamesWithScores) {
-            const profilePhoto = await fetchProfilePhoto(url)
-            platformData.push({
+    const prepareEntries = (usernamesWithScores, platform) => {
+        const platformDataPromises = usernamesWithScores.map(({ url, username, score }) => {
+            return fetchProfilePhoto(url).then(profilePhoto => ({
                 platform: platform.charAt(0).toUpperCase() + platform.slice(1),
                 username,
                 profileUrl: url,
                 profilePhoto,
                 score
+            }))
+        })
+        return Promise.all(platformDataPromises)
+    }
+
+    const displayDataPromises = [
+        prepareEntries(instagramUsernamesWithScores, 'instagram'),
+        prepareEntries(linkedinUsernamesWithScores, 'linkedin'),
+        prepareEntries(twitterUsernamesWithScores, 'twitter'),
+        prepareEntries(facebookUsernamesWithScores, 'facebook')
+    ]
+
+    return Promise.all(displayDataPromises).then(results => {
+        const displayData = [].concat(...results)
+        for (const { url, score } of otherUsernamesWithScores) {
+            displayData.push({
+                platform: 'Other',
+                username: url,
+                profileUrl: url,
+                profilePhoto: url,
+                score
             })
         }
-        return platformData
-    }
-
-    const displayData = []
-    displayData.push(...await prepareEntries(instagramUsernamesWithScores, 'instagram'))
-    displayData.push(...await prepareEntries(linkedinUsernamesWithScores, 'linkedin'))
-    displayData.push(...await prepareEntries(twitterUsernamesWithScores, 'twitter'))
-    displayData.push(...await prepareEntries(facebookUsernamesWithScores, 'facebook'))
-
-    for (const { url, score } of otherUsernamesWithScores) {
-        displayData.push({
-            platform: 'Other',
-            username: url,
-            profileUrl: url,
-            profilePhoto: url,
-            score
-        })
-    }
-
-    return displayData
+        return displayData
+    })
 }
 
 module.exports = {
