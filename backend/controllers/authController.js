@@ -8,7 +8,6 @@ const validateRegisterData = require('../validation/register')
 
 const register = async (req, res) => {
     try {
-        console.log(req)
         const { isValid, errors } = validateRegisterData(req.body)
 
         if (!isValid) return errorResponse(res, errors, 'Invalid data', HTTP_BAD_REQUEST_400)
@@ -42,9 +41,45 @@ const register = async (req, res) => {
         }
         return successResponse(res, response, 'User register successfully.')
     } catch (error) {
-        console.log(error)
         return errorResponse(res, { error: error.message }, error.message, HTTP_INTERNAL_SERVER_ERROR_500)
     }
 }
 
-module.exports = { register }
+const login = async (req, res) => {
+    try {
+        const { isValid, errors } = validateRegisterData(req.body)
+
+        if (!isValid) return errorResponse(res, errors, 'Invalid data', HTTP_BAD_REQUEST_400)
+
+        const email = req.body.email.toLowerCase().trim()
+        const password = req.body.password
+        const user = await User.findOne({ email })
+
+        if (_.isEmpty(user)) {
+            return errorResponse(res, {}, 'User does not exist please create account..', HTTP_BAD_REQUEST_400)
+        }
+
+        const isPasswordMatch = await bcrypt.compare(password, user.password)
+        if (isPasswordMatch === false) return errorResponse(res, {}, 'Invalid email or password.', HTTP_BAD_REQUEST_400)
+
+        const payload = {
+            id: user.id,
+            isAdmin: isAdmin,
+            role: user.role
+        }
+
+        // use user jwtSecret if exist
+        const jwtSecret = _.get(user, 'jwtSecret', process.env.JWT_SECRET)
+        const token = await jwt.sign(payload, jwtSecret, { expiresIn: '2d' })
+
+        const data = {
+            success: true,
+            token: 'Bearer ' + token
+        }
+        return successResponse(res, data, 'Login user Successfully')
+    } catch (error) {
+        return errorResponse(res, { error: error.message }, error.message, HTTP_INTERNAL_SERVER_ERROR_500)
+    }
+}
+
+module.exports = { register, login }

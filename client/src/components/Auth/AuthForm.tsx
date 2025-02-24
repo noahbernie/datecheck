@@ -3,7 +3,9 @@ import {
     Mail,
     Lock,
     User
-} from 'lucide-react';
+} from 'lucide-react'
+import { useDispatch } from 'react-redux'
+import { authUser } from '../../reducer/authReducer'
 
 interface Data {
     email: string
@@ -14,6 +16,7 @@ const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [data, setData] = useState<Data>({ email: "", password: "" })
     const [authError, setAuthError] = useState('')
+    const dispatch = useDispatch()
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault()
@@ -24,6 +27,7 @@ const AuthForm = () => {
 
     const handleAuthSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setAuthError('')
         try {
             const response = await fetch('http://127.0.0.1:5000/api/user/register', {
                 method: 'POST',
@@ -31,10 +35,35 @@ const AuthForm = () => {
                 body: JSON.stringify(data),
             });
             if (!response.ok) {
-                const error = await response.json();
-                console.log(error.message)
+                const error = await response.json()
+                let errorMessage = error.message
+                if (error.errors !== undefined) {
+                    errorMessage = error.errors[0].message
+                }
+                throw new Error(errorMessage || 'Failed to register');
+            }
+            const responseData = await response.json()
+            dispatch(responseData.data)
+        } catch (error: any) {
+            setAuthError(error.message || 'Something went wrong');
+        }
+        // console.log(res)
+        // setShowAuth(false);
+        // setShowPaywall(true);
+    }
 
-                throw new Error(error.message || 'Failed to filter results');
+    const handleLoginSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setAuthError('')
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/user/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+            if (!response.ok) {
+                const error = await response.json()
+                throw new Error(error.message || 'Failed to login');
             }
         } catch (error: any) {
             setAuthError(error.message || 'Something went wrong');
@@ -42,7 +71,7 @@ const AuthForm = () => {
         // console.log(res)
         // setShowAuth(false);
         // setShowPaywall(true);
-    };
+    }
 
     return (
         <>
@@ -60,7 +89,7 @@ const AuthForm = () => {
                         </p>
                     </div>
 
-                    <form onSubmit={handleAuthSubmit} className="space-y-4">
+                    <form onSubmit={isLogin ? handleLoginSubmit : handleAuthSubmit} className="space-y-4">
                         <div>
                             <label className="block text-white/90 mb-2" htmlFor="email">
                                 Email
