@@ -17,3 +17,4 @@ const validateRegisterData = (data) => {
   
   module.exports = validateRegisterData
   
+  

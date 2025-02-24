@@ -1,5 +1,4 @@
 import { Sparkles, Instagram, Linkedin, Facebook, Youtube, ArrowRight } from 'lucide-react'
-import React from 'react'
 import MatchCard from '../MatchCard/matchCard';
 
 interface UploadResult {
