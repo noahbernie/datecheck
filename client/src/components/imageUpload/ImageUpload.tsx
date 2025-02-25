@@ -17,6 +17,8 @@ import {
 import AuthForm from '../Auth/AuthForm';
 import PricingTier from '../Pricing/PricingTier';
 import InsightsPage from '../InsightsPage/insightPage';
+import { getBaseUrl } from '../../../actions/api'
+const BASE_URL = getBaseUrl()
 
 interface UploadResult {
     username: string;
@@ -69,7 +71,7 @@ const ImageUpload = () => {
             const formData = new FormData();
             formData.append('image', file);
 
-            const uploadResponse = await fetch('http://127.0.0.1:5000/api/upload-image', {
+            const uploadResponse = await fetch(`${BASE_URL}/api/upload-image`, {
                 method: 'POST',
                 body: formData,
             });
@@ -81,7 +83,7 @@ const ImageUpload = () => {
 
             const uploadData = await uploadResponse.json();
 
-            const filterResponse = await fetch('http://127.0.0.1:5000/api/filter-results', {
+            const filterResponse = await fetch(`${BASE_URL}/api/filter-results`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ results: uploadData.data.results }),
@@ -95,7 +97,7 @@ const ImageUpload = () => {
             const filterData = await filterResponse.json();
 
             const prepareDisplayResponse = await fetch(
-                'http://127.0.0.1:5000/api/prepare-display-data',
+                `${BASE_URL}/api/prepare-display-data`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

@@ -1,6 +1,6 @@
 export const getBaseUrl = () => {
     if (window.location.hostname === 'localhost') {
-        return 'http://localhost:5000'
+        return 'http://127.0.0.1:5000'
     }
     let host = window.location.host
     let protocol = window.location.protocol

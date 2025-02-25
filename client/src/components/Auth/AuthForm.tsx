@@ -6,6 +6,8 @@ import {
 } from 'lucide-react'
 import { useDispatch } from 'react-redux'
 import { authUser } from '../../reducer/authReducer'
+import { getBaseUrl } from '../../../actions/api'
+const BASE_URL = getBaseUrl()
 
 interface Data {
     email: string
@@ -29,7 +31,7 @@ const AuthForm = () => {
         e.preventDefault();
         setAuthError('')
         try {
-            const response = await fetch('http://127.0.0.1:5000/api/user/register', {
+            const response = await fetch(`${BASE_URL}/api/user/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
@@ -56,7 +58,7 @@ const AuthForm = () => {
         e.preventDefault()
         setAuthError('')
         try {
-            const response = await fetch('http://127.0.0.1:5000/api/user/login', {
+            const response = await fetch(`${BASE_URL}/api/user/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
