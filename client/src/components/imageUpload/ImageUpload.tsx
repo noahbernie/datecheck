@@ -35,7 +35,7 @@ interface UploadResult {
 
 const ImageUpload = () => {
     const [dragActive, setDragActive] = useState(false);
-    const [showAuth, setShowAuth] = useState(true);
+    const [showAuth, setShowAuth] = useState(false);
     const [showPaywall, setShowPaywall] = useState(false);
     const [showInsights, setShowInsights] = useState(false);
     const [uploading, setUploading] = useState(false);
