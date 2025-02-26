@@ -46,6 +46,10 @@ const filterResultsEndpoint = (req, res) => {
     }
     results = data['results']
 
+    if (results.results === null) {
+        return errorResponse(res, { error: 'No results provided in the request' }, 'No results provided in the request', HTTP_BAD_REQUEST_400)
+    }
+
     const { instagramUsernames, linkedinUsernames, facebookUsernames, twitterUsernames, otherUsernames } = filter_results(results)
 
     return successResponse(res, {
