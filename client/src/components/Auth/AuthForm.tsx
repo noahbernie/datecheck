@@ -5,7 +5,7 @@ import {
     User
 } from 'lucide-react'
 import { useDispatch } from 'react-redux'
-import { authUser } from '../../reducer/authReducer'
+import { authUser, setShowPaywall, setShowAuth } from '../../reducer/authSlice'
 import { getBaseUrl } from '../../../actions/api'
 const BASE_URL = getBaseUrl()
 
@@ -31,48 +31,49 @@ const AuthForm = () => {
         e.preventDefault();
         setAuthError('')
         try {
-            const response = await fetch(`${BASE_URL}/api/user/register`, {
+            const res = await fetch(`${BASE_URL}/api/user/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
             });
-            if (!response.ok) {
-                const error = await response.json()
-                let errorMessage = error.message
-                if (error.errors !== undefined) {
-                    errorMessage = error.errors[0].message
+            const response = await res.json()
+            if (response.success === 0) {
+                let errorMessage = response.message
+                if (response.errors !== undefined) {
+                    errorMessage = response.errors[0].message
                 }
                 throw new Error(errorMessage || 'Failed to register');
             }
-            const responseData = await response.json()
-            dispatch(responseData.data)
+            dispatch(authUser(response.data))
         } catch (error: any) {
             setAuthError(error.message || 'Something went wrong');
         }
-        // console.log(res)
-        // setShowAuth(false);
-        // setShowPaywall(true);
+        dispatch(setShowAuth(false))
+        dispatch(setShowPaywall(true))
     }
 
     const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setAuthError('')
         try {
-            const response = await fetch(`${BASE_URL}/api/user/login`, {
+            const res = await fetch(`${BASE_URL}/api/user/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
             });
-            if (!response.ok) {
-                const error = await response.json()
-                throw new Error(error.message || 'Failed to login');
+            const response = await res.json()
+            if (response.success === 0) {
+                let errorMessage = response.message
+                if (response.errors !== undefined) {
+                    errorMessage = response.errors[0].message
+                }
+                throw new Error(errorMessage || 'Failed to login');
             }
         } catch (error: any) {
             setAuthError(error.message || 'Something went wrong');
         }
-        // console.log(res)
-        // setShowAuth(false);
-        // setShowPaywall(true);
+        dispatch(setShowAuth(false))
+        dispatch(setShowPaywall(true))
     }
 
     return (

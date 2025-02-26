@@ -14,9 +14,12 @@ import {
     Crown,
     Zap,
 } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux'
 import AuthForm from '../Auth/AuthForm';
 import PricingTier from '../Pricing/PricingTier';
 import InsightsPage from '../InsightsPage/insightPage';
+import { setShowAuth } from '../../reducer/authSlice'
+import { RootState } from '../../reducer/store'
 import { getBaseUrl } from '../../../actions/api'
 const BASE_URL = getBaseUrl()
 
@@ -34,13 +37,16 @@ interface UploadResult {
 }
 
 const ImageUpload = () => {
-    const [dragActive, setDragActive] = useState(false);
-    const [showAuth, setShowAuth] = useState(false);
-    const [showPaywall, setShowPaywall] = useState(false);
-    const [showInsights, setShowInsights] = useState(false);
-    const [uploading, setUploading] = useState(false);
-    const [uploadError, setUploadError] = useState('');
+    const [dragActive, setDragActive] = useState(false)
+    const [showInsights, setShowInsights] = useState(false)
+    const [uploading, setUploading] = useState(false)
+    const [uploadError, setUploadError] = useState('')
     const [uploadResults, setUploadResults] = useState<UploadResult[] | null>(null);
+
+    const dispatch = useDispatch()
+    const userData = useSelector((state: RootState) => state.auth)
+    const showAuth = userData.showAuth
+    const showPaywall = userData.showPaywall
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -75,13 +81,14 @@ const ImageUpload = () => {
                 method: 'POST',
                 body: formData,
             });
-
-            if (!uploadResponse.ok) {
-                const error = await uploadResponse.json();
-                throw new Error(error.error || 'Failed to upload image');
+            const uploadData = await uploadResponse.json()
+            if (uploadData.success === 0) {
+                let errorMessage = uploadData.message
+                if (uploadData.errors !== undefined) {
+                    errorMessage = uploadData.errors[0].message
+                }
+                throw new Error(errorMessage || 'Failed to upload image');
             }
-
-            const uploadData = await uploadResponse.json();
 
             const filterResponse = await fetch(`${BASE_URL}/api/filter-results`, {
                 method: 'POST',
@@ -89,12 +96,15 @@ const ImageUpload = () => {
                 body: JSON.stringify({ results: uploadData.data.results }),
             });
 
-            if (!filterResponse.ok) {
-                const error = await filterResponse.json();
-                throw new Error(error.error || 'Failed to filter results');
+            const filterData = await filterResponse.json();
+            if (filterData.success === 0) {
+                let errorMessage = filterData.message
+                if (filterData.errors !== undefined) {
+                    errorMessage = filterData.errors[0].message
+                }
+                throw new Error(errorMessage || 'Failed to filter results');
             }
 
-            const filterData = await filterResponse.json();
 
             const prepareDisplayResponse = await fetch(
                 `${BASE_URL}/api/prepare-display-data`,
@@ -111,15 +121,19 @@ const ImageUpload = () => {
                 }
             );
 
-            if (!prepareDisplayResponse.ok) {
-                const error = await prepareDisplayResponse.json();
-                throw new Error(error.error || 'Failed to prepare display data');
-            }
-
             const preparedDisplayData = await prepareDisplayResponse.json();
 
+            if (preparedDisplayData.success === 0) {
+                let errorMessage = preparedDisplayData.message
+                if (preparedDisplayData.errors !== undefined) {
+                    errorMessage = preparedDisplayData.errors[0].message
+                }
+                throw new Error(errorMessage || 'Failed to prepare display data');
+            }
+
+
             setUploadResults(preparedDisplayData.data.display_data);
-            setShowAuth(true);
+            dispatch(setShowAuth(true))
         } catch (error: any) {
             setUploadError(error.message || 'Something went wrong');
         } finally {
@@ -135,7 +149,7 @@ const ImageUpload = () => {
     };
 
     const handlePlanSelection = () => {
-        setShowPaywall(false);
+        // setShowPaywall(false);
         setShowInsights(true);
     };
 
