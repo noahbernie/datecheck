@@ -85,9 +85,6 @@ const ImageUpload = () => {
             const uploadData = await uploadResponse.json()
             if (uploadData.success === 0) {
                 let errorMessage = uploadData.message
-                if (_.isEmpty(uploadData.errors) === false) {
-                    errorMessage = uploadData.errors[0].message
-                }
                 throw new Error(errorMessage || 'Failed to upload image');
             }
 
@@ -100,9 +97,6 @@ const ImageUpload = () => {
             const filterData = await filterResponse.json();
             if (filterData.success === 0) {
                 let errorMessage = filterData.message
-                if (_.isEmpty(filterData.errors) === false) {
-                    errorMessage = filterData.errors[0].message
-                }
                 throw new Error(errorMessage || 'Failed to filter results');
             }
 
@@ -126,9 +120,6 @@ const ImageUpload = () => {
 
             if (preparedDisplayData.success === 0) {
                 let errorMessage = preparedDisplayData.message
-                if (_.isEmpty(preparedDisplayData.errors) === false) {
-                    errorMessage = preparedDisplayData.errors[0].message
-                }
                 throw new Error(errorMessage || 'Failed to prepare display data');
             }
 
@@ -136,7 +127,11 @@ const ImageUpload = () => {
             setUploadResults(preparedDisplayData.data.display_data);
             dispatch(setShowAuth(true))
         } catch (error: any) {
-            setUploadError('Service Unavailable. Please contact admin.');
+            let errorMessage = error.message
+            if (errorMessage === undefined) {
+                errorMessage = 'Service Unavailable. Please contact admin.'
+            }
+            setUploadError(errorMessage);
             return { success: 0 }
         } finally {
             setUploading(false);
