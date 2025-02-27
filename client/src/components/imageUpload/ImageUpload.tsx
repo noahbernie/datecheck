@@ -15,6 +15,7 @@ import {
     Zap,
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux'
+import _ from 'lodash'
 import AuthForm from '../Auth/AuthForm';
 import PricingTier from '../Pricing/PricingTier';
 import InsightsPage from '../InsightsPage/insightPage';
@@ -84,7 +85,7 @@ const ImageUpload = () => {
             const uploadData = await uploadResponse.json()
             if (uploadData.success === 0) {
                 let errorMessage = uploadData.message
-                if (uploadData.errors !== undefined) {
+                if (_.isEmpty(uploadData.errors) === false) {
                     errorMessage = uploadData.errors[0].message
                 }
                 throw new Error(errorMessage || 'Failed to upload image');
@@ -99,7 +100,7 @@ const ImageUpload = () => {
             const filterData = await filterResponse.json();
             if (filterData.success === 0) {
                 let errorMessage = filterData.message
-                if (filterData.errors !== undefined) {
+                if (_.isEmpty(filterData.errors) === false) {
                     errorMessage = filterData.errors[0].message
                 }
                 throw new Error(errorMessage || 'Failed to filter results');
@@ -125,7 +126,7 @@ const ImageUpload = () => {
 
             if (preparedDisplayData.success === 0) {
                 let errorMessage = preparedDisplayData.message
-                if (preparedDisplayData.errors !== undefined) {
+                if (_.isEmpty(preparedDisplayData.errors) === false) {
                     errorMessage = preparedDisplayData.errors[0].message
                 }
                 throw new Error(errorMessage || 'Failed to prepare display data');
@@ -188,6 +189,7 @@ const ImageUpload = () => {
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                 accept="image/*"
                                 onChange={handleFileInput}
+                                disabled={uploading}
                             />
                             <div className="text-center">
                                 <Upload className="w-12 h-12 text-white mx-auto mb-4 animate-bounce" />

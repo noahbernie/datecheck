@@ -64,7 +64,7 @@ const login = async (req, res) => {
 
         const payload = {
             id: user.id,
-            isAdmin: isAdmin,
+            isAdmin: user.isAdmin,
             role: user.role
         }
 

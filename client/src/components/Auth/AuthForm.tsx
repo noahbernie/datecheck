@@ -5,6 +5,8 @@ import {
     User
 } from 'lucide-react'
 import { useDispatch } from 'react-redux'
+import _ from 'lodash'
+import { ToastContainer, toast } from 'react-toastify'
 import { authUser, setShowPaywall, setShowAuth } from '../../reducer/authSlice'
 import { getBaseUrl } from '../../../actions/api'
 const BASE_URL = getBaseUrl()
@@ -39,17 +41,31 @@ const AuthForm = () => {
             const response = await res.json()
             if (response.success === 0) {
                 let errorMessage = response.message
-                if (response.errors !== undefined) {
+                if (_.isEmpty(response.errors) === false) {
                     errorMessage = response.errors[0].message
                 }
                 throw new Error(errorMessage || 'Failed to register');
             }
             dispatch(authUser(response.data))
+
+            toast.success('Register successfully', {
+                position: "top-left",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light"
+            })
+            localStorage.setItem('authToken', response.data.token)
+            setTimeout(() => {
+                dispatch(setShowAuth(false))
+                dispatch(setShowPaywall(true))
+            }, 1500)
         } catch (error: any) {
             setAuthError(error.message || 'Something went wrong');
         }
-        dispatch(setShowAuth(false))
-        dispatch(setShowPaywall(true))
     }
 
     const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -64,16 +80,35 @@ const AuthForm = () => {
             const response = await res.json()
             if (response.success === 0) {
                 let errorMessage = response.message
-                if (response.errors !== undefined) {
+                if (_.isEmpty(response.errors) === false) {
                     errorMessage = response.errors[0].message
                 }
                 throw new Error(errorMessage || 'Failed to login');
             }
+
+            toast.success('Login successfully.', {
+                position: "top-left",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light"
+            })
+            localStorage.setItem('authToken', response.data.token)
+            setTimeout(() => {
+                dispatch(setShowAuth(false))
+                dispatch(setShowPaywall(true))
+            }, 1500)
         } catch (error: any) {
             setAuthError(error.message || 'Something went wrong');
         }
-        dispatch(setShowAuth(false))
-        dispatch(setShowPaywall(true))
+    }
+
+    const handleSetAuth = () => {
+        setIsLogin(!isLogin)
+        setAuthError('')
     }
 
     return (
@@ -137,7 +172,7 @@ const AuthForm = () => {
 
                     <div className="mt-6 text-center">
                         <button
-                            onClick={() => setIsLogin(!isLogin)}
+                            onClick={handleSetAuth}
                             className="text-white/70 hover:text-white transition-colors"
                         >
                             {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
@@ -147,6 +182,7 @@ const AuthForm = () => {
                 {authError && (
                     <div className="text-center mt-4 text-red-500">{authError}</div>
                 )}
+            <ToastContainer />
             </div>
         </>
     )
