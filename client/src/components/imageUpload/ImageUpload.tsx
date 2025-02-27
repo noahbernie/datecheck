@@ -135,7 +135,8 @@ const ImageUpload = () => {
             setUploadResults(preparedDisplayData.data.display_data);
             dispatch(setShowAuth(true))
         } catch (error: any) {
-            setUploadError(error.message || 'Something went wrong');
+            setUploadError('Service Unavailable. Please contact admin.');
+            return { success: 0 }
         } finally {
             setUploading(false);
         }
@@ -144,7 +145,10 @@ const ImageUpload = () => {
     const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (files && files[0]) {
-            await uploadImage(files[0]);
+            const data = await uploadImage(files[0]);
+            if (data?.success === 0) {
+                e.target.value = ''
+            }
         }
     };
 
