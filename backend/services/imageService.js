@@ -7,7 +7,7 @@ const rl = readline.createInterface({
     output: process.stdout
 })
 const fs = require('fs')
-const APITOKEN = 'uXfDEJnPDTFB/riggN9gZvhnmwaYtMTEV6e8Kce9cwjNKvIs/+CvGgN4agdwhqbJYaIjIHQsmXo='
+const APITOKEN = 'tmSWkdDten7CzaD8IdSOjhp/okSsNXAdGXKQVuj5rO3HowsnNoi9zBdx9f3sHIDYutK4DhZuQlg='
 const TESTING_MODE = false
 
 const get_image_results = async (imagePath) => {
