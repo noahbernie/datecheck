@@ -127,11 +127,7 @@ const ImageUpload = () => {
             setUploadResults(preparedDisplayData.data.display_data);
             dispatch(setShowAuth(true))
         } catch (error: any) {
-            let errorMessage = error.message
-            if (errorMessage === undefined) {
-                errorMessage = 'Service Unavailable. Please contact admin.'
-            }
-            setUploadError(errorMessage);
+            setUploadError('Service Unavailable. Please contact admin.');
             return { success: 0 }
         } finally {
             setUploading(false);
