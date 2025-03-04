@@ -9,6 +9,7 @@ import _ from 'lodash'
 import { ToastContainer, toast } from 'react-toastify'
 import { authUser, setShowPaywall, setShowAuth } from '../../reducer/authSlice'
 import { getBaseUrl } from '../../../actions/api'
+import setAuthToken from '../../../utils/authToken';
 const BASE_URL = getBaseUrl()
 
 interface Data {
@@ -59,6 +60,7 @@ const AuthForm = () => {
                 theme: "light"
             })
             localStorage.setItem('authToken', response.data.token)
+            setAuthToken(response.data.token)
             setTimeout(() => {
                 dispatch(setShowAuth(false))
                 dispatch(setShowPaywall(true))
@@ -97,6 +99,7 @@ const AuthForm = () => {
                 theme: "light"
             })
             localStorage.setItem('authToken', response.data.token)
+            setAuthToken(response.data.token)
             setTimeout(() => {
                 dispatch(setShowAuth(false))
                 dispatch(setShowPaywall(true))
@@ -182,7 +185,7 @@ const AuthForm = () => {
                 {authError && (
                     <div className="text-center mt-4 text-red-500">{authError}</div>
                 )}
-            <ToastContainer />
+                <ToastContainer />
             </div>
         </>
     )

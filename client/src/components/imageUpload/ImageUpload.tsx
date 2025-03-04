@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import {
     Upload,
@@ -22,6 +22,7 @@ import InsightsPage from '../InsightsPage/insightPage';
 import { setShowAuth } from '../../reducer/authSlice'
 import { RootState } from '../../reducer/store'
 import { getBaseUrl } from '../../../actions/api'
+import data from './../../components/Array'
 const BASE_URL = getBaseUrl()
 
 interface UploadResult {
@@ -227,7 +228,6 @@ const ImageUpload = () => {
                 </div>
             ) : showAuth && !showPaywall && !showInsights ? (
                 <>
-                    {console.log('inside near')}
                     <AuthForm />
                 </>
             ) : showPaywall && !showInsights ? (

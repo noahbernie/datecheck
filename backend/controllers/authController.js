@@ -15,7 +15,7 @@ const register = async (req, res) => {
         const userEmail = email.toLowerCase().trim()
         const isUserExist = await User.exists({ email: userEmail })
         if (isUserExist) {
-            const errorMessage = 'This email is already in use. Please use another email.'
+            const errorMessage = 'This email address is already associated with an existing account. Please try a different email address.'
             return errorResponse(res, { error: errorMessage }, errorMessage, HTTP_BAD_REQUEST_400)
         }
 
@@ -34,12 +34,12 @@ const register = async (req, res) => {
             isAdmin: user.isAdmin,
             role: user.role
         }
-        const token = await jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '2d' })
+        const token = await jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '365d' })
         const response = {
             token: `Bearer ${token}`,
             userId: user._id
         }
-        return successResponse(res, response, 'User register successfully.')
+        return successResponse(res, response, 'Account created successfully. ')
     } catch (error) {
         return errorResponse(res, { error: error.message }, error.message, HTTP_INTERNAL_SERVER_ERROR_500)
     }
@@ -56,7 +56,7 @@ const login = async (req, res) => {
         const user = await User.findOne({ email })
 
         if (_.isEmpty(user)) {
-            return errorResponse(res, {}, 'User does not exist please create account..', HTTP_BAD_REQUEST_400)
+            return errorResponse(res, {}, 'We couldn\'t find an account associated with these credentials. Please create an account to continue.', HTTP_BAD_REQUEST_400)
         }
 
         const isPasswordMatch = await bcrypt.compare(password, user.password)
@@ -70,16 +70,26 @@ const login = async (req, res) => {
 
         // use user jwtSecret if exist
         const jwtSecret = _.get(user, 'jwtSecret', process.env.JWT_SECRET)
-        const token = await jwt.sign(payload, jwtSecret, { expiresIn: '2d' })
+        const token = await jwt.sign(payload, jwtSecret, { expiresIn: '365d' })
 
         const data = {
             success: true,
             token: 'Bearer ' + token
         }
-        return successResponse(res, data, 'Login user Successfully')
+        return successResponse(res, data, 'Welcome! You have been logged in successfully.')
     } catch (error) {
         return errorResponse(res, { error: error.message }, error.message, HTTP_INTERNAL_SERVER_ERROR_500)
     }
 }
 
-module.exports = { register, login }
+const getCurrentUserDetails = async (req, res) => {
+    try {
+        let user = await User.findOne({ '_id': req.decoded.id }, 'email')
+        return successResponse(res, user, 'Get the user details successfully.')
+    } catch (error) {
+        console.log(error)
+        return errorResponse(res, { error: error.message }, error.message, HTTP_INTERNAL_SERVER_ERROR_500)
+    }
+}
+
+module.exports = { register, login, getCurrentUserDetails }
