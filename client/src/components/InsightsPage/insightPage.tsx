@@ -6,8 +6,8 @@ interface UploadResult {
     score: number;
     platforms: string[];
     platform: string;
-    profile_photo: string;
-    profile_url: string;
+    profilePhoto: string;
+    profileUrl: string;
 }
 
 const InsightsPage = ({ uploadResults }: { uploadResults: UploadResult[] | null }) => {
@@ -34,7 +34,7 @@ const InsightsPage = ({ uploadResults }: { uploadResults: UploadResult[] | null 
                             platform={result.platform}
                             username={result.username}
                             matchPercentage={result.score}
-                            profileImage={result.profile_photo}
+                            profileImage={result.profilePhoto}
                             icon={
                                 result.platform.toLowerCase() === 'instagram'
                                     ? Instagram
@@ -47,14 +47,17 @@ const InsightsPage = ({ uploadResults }: { uploadResults: UploadResult[] | null 
                                                 : Sparkles // Default icon
                             }
                         >
-                            <a
-                                href={result.profile_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <button
+                                onClick={() => {
+                                    const newTab = window.open('about:blank', '_blank', 'noopener,noreferrer')
+                                    if (newTab) {
+                                        newTab.location.href = result.profileUrl
+                                    }
+                                }}
                                 className="w-full bg-white/10 hover:bg-white/20 text-white py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors mt-4"
                             >
                                 <span>View Profile</span>
-                            </a>
+                            </button>
                         </MatchCard>
                     ))
                 ) : (
