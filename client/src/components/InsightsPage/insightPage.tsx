@@ -1,35 +1,27 @@
-import { Sparkles, Instagram, Linkedin, Facebook, Youtube, ArrowRight } from 'lucide-react'
-import MatchCard from '../MatchCard/matchCard';
+import { Sparkles } from 'lucide-react'
+import MatchCard from '../MatchCard/matchCard'
 
-interface UploadResult {
-    username: string;
-    score: number;
-    platforms: string[];
-    platform: string;
-    profilePhoto: string;
-    profileUrl: string;
-}
-
-const InsightsPage = ({ uploadResults }: { uploadResults: UploadResult[] | null }) => {
+const InsightsPage = () => {
     return (
-        <div className="container mx-auto px-4 py-20 animate-fade-in">
-            <div className="text-center mb-16">
-                <div className="inline-block p-3 rounded-full bg-pink-500/20 backdrop-blur-lg mb-6">
-                    <Sparkles className="w-10 h-10 text-pink-300" />
+        <div className="min-h-screen bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500">
+            <div className="container mx-auto px-4 py-20 animate-fade-in">
+                <div className="text-center mb-16">
+                    <div className="inline-block p-3 rounded-full bg-pink-500/20 backdrop-blur-lg mb-6">
+                        <Sparkles className="w-10 h-10 text-pink-300" />
+                    </div>
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 animate-title">
+                        Your Style Matches
+                    </h2>
+                    <p className="text-xl text-white/90 animate-fade-in-up max-w-2xl mx-auto">
+                        Based on your style preferences, we've found these profiles that match your aesthetic.
+                        Connect with like-minded individuals across different platforms.
+                    </p>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 animate-title">
-                    Your Style Matches
-                </h2>
-                <p className="text-xl text-white/90 animate-fade-in-up max-w-2xl mx-auto">
-                    Based on your style preferences, we've found these profiles that match your aesthetic.
-                    Connect with like-minded individuals across different platforms.
-                </p>
-            </div>
 
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                {uploadResults && uploadResults.length > 0 ? (
-                    uploadResults.map((result, index) => (
-                        <MatchCard
+                <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    {/* {uploadResults && uploadResults.length > 0 ? (
+                    uploadResults.map((result, index) => ( */}
+                    {/* <MatchCard
                             key={index}
                             platform={result.platform}
                             username={result.username}
@@ -64,10 +56,10 @@ const InsightsPage = ({ uploadResults }: { uploadResults: UploadResult[] | null 
                     <p className="text-center text-white/70">
                         No style matches found yet. Upload a screenshot to see matches.
                     </p>
-                )}
-            </div>
+                )} */}
+                </div>
 
-            {uploadResults && uploadResults.length > 0 && (
+                {/* {uploadResults && uploadResults.length > 0 && (
                 <div className="mt-12 text-center">
                     <p className="text-white/70 mb-6">Want to see more matches?</p>
                     <button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-8 rounded-lg font-semibold hover:opacity-90 transition-opacity inline-flex items-center group">
@@ -75,7 +67,8 @@ const InsightsPage = ({ uploadResults }: { uploadResults: UploadResult[] | null 
                         <ArrowRight className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" />
                     </button>
                 </div>
-            )}
+            )} */}
+            </div>
         </div>
     )
 }
