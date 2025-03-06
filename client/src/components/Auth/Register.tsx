@@ -5,11 +5,11 @@ import {
     User
 } from 'lucide-react'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import _ from 'lodash'
-import { ToastContainer, toast } from 'react-toastify'
 import { authUser, setShowPaywall, setShowAuth } from '../../reducer/authSlice'
 import { getBaseUrl } from '../../../actions/api'
-import setAuthToken from '../../../utils/authToken';
+import setAuthToken from '../../../utils/authToken'
 const BASE_URL = getBaseUrl()
 
 interface Data {
@@ -17,11 +17,11 @@ interface Data {
     password: string
 }
 
-const AuthForm = () => {
-    const [isLogin, setIsLogin] = useState(true);
+const Register = () => {
     const [data, setData] = useState<Data>({ email: "", password: "" })
     const [authError, setAuthError] = useState('')
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault()
@@ -49,55 +49,6 @@ const AuthForm = () => {
             }
             dispatch(authUser(response.data))
 
-            toast.success('Register successfully', {
-                position: "top-left",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
-            })
-            localStorage.setItem('authToken', response.data.token)
-            setAuthToken(response.data.token)
-            setTimeout(() => {
-                dispatch(setShowAuth(false))
-                dispatch(setShowPaywall(true))
-            }, 1500)
-        } catch (error: any) {
-            setAuthError(error.message || 'Something went wrong');
-        }
-    }
-
-    const handleLoginSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setAuthError('')
-        try {
-            const res = await fetch(`${BASE_URL}/api/user/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            });
-            const response = await res.json()
-            if (response.success === 0) {
-                let errorMessage = response.message
-                if (_.isEmpty(response.errors) === false) {
-                    errorMessage = response.errors[0].message
-                }
-                throw new Error(errorMessage || 'Failed to login');
-            }
-
-            toast.success('Login successfully.', {
-                position: "top-left",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light"
-            })
             localStorage.setItem('authToken', response.data.token)
             setAuthToken(response.data.token)
             setTimeout(() => {
@@ -110,12 +61,12 @@ const AuthForm = () => {
     }
 
     const handleSetAuth = () => {
-        setIsLogin(!isLogin)
+        navigate('/login')
         setAuthError('')
     }
 
     return (
-        <>
+        <div className="min-h-screen bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500">
             <div className="container mx-auto px-4 py-20 animate-fade-in">
                 <div className="max-w-md mx-auto bg-white/10 backdrop-blur-lg p-8 rounded-xl">
                     <div className="text-center mb-8">
@@ -123,14 +74,14 @@ const AuthForm = () => {
                             <User className="w-8 h-8 text-pink-300" />
                         </div>
                         <h2 className="text-3xl font-bold text-white mb-2">
-                            {isLogin ? 'Welcome Back!' : 'Create Account'}
+                            Create Account
                         </h2>
                         <p className="text-white/70">
-                            {isLogin ? 'Sign in to continue your journey' : 'Join us to find your perfect match'}
+                            Join us to find your perfect match
                         </p>
                     </div>
 
-                    <form onSubmit={isLogin ? handleLoginSubmit : handleAuthSubmit} className="space-y-4">
+                    <form onSubmit={handleAuthSubmit} className="space-y-4">
                         <div>
                             <label className="block text-white/90 mb-2" htmlFor="email">
                                 Email
@@ -169,7 +120,7 @@ const AuthForm = () => {
                             type="submit"
                             className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
                         >
-                            {isLogin ? 'Sign In' : 'Create Account'}
+                            Create Account
                         </button>
                     </form>
 
@@ -178,17 +129,16 @@ const AuthForm = () => {
                             onClick={handleSetAuth}
                             className="text-white/70 hover:text-white transition-colors"
                         >
-                            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+                            Don't have an account? Sign up
                         </button>
                     </div>
                 </div>
                 {authError && (
                     <div className="text-center mt-4 text-red-500">{authError}</div>
                 )}
-                <ToastContainer />
             </div>
-        </>
+        </div>
     )
 }
 
-export default AuthForm
+export default Register
