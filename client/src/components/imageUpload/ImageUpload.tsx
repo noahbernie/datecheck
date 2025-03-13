@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-
+import { useNavigate } from 'react-router-dom'
 import {
     Upload,
     Heart,
@@ -34,7 +34,9 @@ const ImageUpload = () => {
     const [dragActive, setDragActive] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [uploadError, setUploadError] = useState('')
-    const [uploadResults, setUploadResults] = useState<UploadResult[] | null>(null);
+    const [uploadResults, setUploadResults] = useState<UploadResult[] | null>(null)
+
+    const navigate = useNavigate()
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -137,6 +139,22 @@ const ImageUpload = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500">
+            <div className="flex justify-end p-4 space-x-4">
+                <button
+                    type="button"
+                    onClick={() => navigate('/login')}
+                    className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                >
+                    Login
+                </button>
+                <button
+                    type="button"
+                    onClick={() => navigate('/register')}
+                    className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                >
+                    Register
+                </button>
+            </div>
             <div className="container mx-auto px-4 py-20">
                 <div className="text-center mb-16 animate-fade-in">
                     <div className="flex justify-center mb-6">
