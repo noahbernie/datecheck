@@ -3,7 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const { successResponse, errorResponse } = require('../utils/errorHandler')
 const { HTTP_BAD_REQUEST_400, HTTP_INTERNAL_SERVER_ERROR_500 } = require('../utils/https.status')
-const { get_image_results, filter_results, find_most_likely_username, isValidUrl, prepare_display_data } = require('../services/imageService')
+const { filter_results, find_most_likely_username, isValidUrl, prepare_display_data } = require('../services/imageService')
 
 const uploadImage = async (req, res) => {
     if (!req.file) {
@@ -21,12 +21,12 @@ const uploadImage = async (req, res) => {
 
         // Call the getImageResults function with the temporary file path
         try {
-            const results = await get_image_results(filePath);
+            // const results = await get_image_results(filePath);
             // Clean up: Delete the temporary file and directory
-            fs.unlinkSync(filePath); // Delete the file
-            fs.rmdirSync(tempDir.name); // Remove the temporary directory
+            // fs.unlinkSync(filePath); // Delete the file
+            // fs.rmdirSync(tempDir.name); // Remove the temporary directory
 
-            return successResponse(res, { results: results }, 'Image uploaded successfully')
+            return successResponse(res, { results: filePath }, 'Image uploaded successfully')
         } catch (error) {
             // Clean up on error
             fs.unlinkSync(filePath)
@@ -40,17 +40,11 @@ const uploadImage = async (req, res) => {
 }
 
 const filterResultsEndpoint = (req, res) => {
-    const data = req.body;
+    const data = req.body
     if (!data) {
         return errorResponse(res, { error: 'No results provided in the request' }, 'No results provided in the request', HTTP_BAD_REQUEST_400)
     }
-    results = data['results']
-
-    if (results.results === null) {
-        return errorResponse(res, { error: 'No results provided in the request' }, 'No results provided in the request', HTTP_BAD_REQUEST_400)
-    }
-
-    const { instagramUsernames, linkedinUsernames, facebookUsernames, twitterUsernames, otherUsernames } = filter_results(results)
+    const { instagramUsernames, linkedinUsernames, facebookUsernames, twitterUsernames, otherUsernames } = filter_results(data)
 
     return successResponse(res, {
         'instagram': instagramUsernames,
@@ -62,7 +56,7 @@ const filterResultsEndpoint = (req, res) => {
 }
 
 const prepareDisplayDataEndpoint = async (req, res) => {
-    const data = req.body;
+    const data = req.body
     if (!data) {
         return errorResponse(res, { error: 'Invalid request data' }, 'Invalid request data', HTTP_BAD_REQUEST_400)
     }

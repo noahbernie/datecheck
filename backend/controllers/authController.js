@@ -63,7 +63,7 @@ const login = async (req, res) => {
         if (isPasswordMatch === false) return errorResponse(res, {}, 'Invalid email or password.', HTTP_BAD_REQUEST_400)
 
         const payload = {
-            id: user.id,
+            id: user._id,
             isAdmin: user.isAdmin,
             role: user.role
         }
@@ -73,8 +73,9 @@ const login = async (req, res) => {
         const token = await jwt.sign(payload, jwtSecret, { expiresIn: '365d' })
 
         const data = {
-            success: true,
-            token: 'Bearer ' + token
+            token: 'Bearer ' + token,
+            plan_status: user.plan_status,
+            userId: user._id
         }
         return successResponse(res, data, 'Welcome! You have been logged in successfully.')
     } catch (error) {
@@ -84,7 +85,7 @@ const login = async (req, res) => {
 
 const getCurrentUserDetails = async (req, res) => {
     try {
-        let user = await User.findOne({ '_id': req.decoded.id }, 'email')
+        let user = await User.findOne({ '_id': req.decoded.id }, 'email plan_status')
         return successResponse(res, user, 'Get the user details successfully.')
     } catch (error) {
         console.log(error)

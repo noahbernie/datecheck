@@ -13,7 +13,10 @@ import {
     Youtube
 } from 'lucide-react'
 import _ from 'lodash'
-
+import { useDispatch } from 'react-redux'
+import { getCurrentUserDetails } from '../../../actions/auth/authAction'
+import { setUserImageFilePath } from '../../reducer/userImageFaceMatches'
+import { AppDispatch } from '../../reducer/store'
 import { getBaseUrl } from '../../../actions/api'
 const BASE_URL = getBaseUrl()
 
@@ -34,9 +37,9 @@ const ImageUpload = () => {
     const [dragActive, setDragActive] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [uploadError, setUploadError] = useState('')
-    const [uploadResults, setUploadResults] = useState<UploadResult[] | null>(null)
-
+    const [uploadResults, setUploadResults] = useState<UploadResult[] | null>(null);
     const navigate = useNavigate()
+    const dispatch: AppDispatch = useDispatch()
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -77,48 +80,18 @@ const ImageUpload = () => {
                 throw new Error(errorMessage || 'Failed to upload image');
             }
 
-            const filterResponse = await fetch(`${BASE_URL}/api/filter-results`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ results: uploadData.data.results }),
-            });
-
-            const filterData = await filterResponse.json();
-            if (filterData.success === 0) {
-                let errorMessage = filterData.message
-                throw new Error(errorMessage || 'Failed to filter results');
+            if (localStorage.getItem('authToken')) {
+                dispatch(getCurrentUserDetails())
+            } else {
+                dispatch(setUserImageFilePath(uploadData.data.results))
+                navigate('/login')
             }
-
-
-            const prepareDisplayResponse = await fetch(
-                `${BASE_URL}/api/prepare-display-data`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        instagram: filterData.data.instagram || [],
-                        linkedin: filterData.data.linkedin || [],
-                        twitter: filterData.data.twitter || [],
-                        facebook: filterData.data.facebook || [],
-                        others: filterData.data.others || [],
-                    }),
-                }
-            );
-
-            const preparedDisplayData = await prepareDisplayResponse.json();
-
-            if (preparedDisplayData.success === 0) {
-                let errorMessage = preparedDisplayData.message
-                throw new Error(errorMessage || 'Failed to prepare display data');
-            }
-
-
-            setUploadResults(preparedDisplayData.data.display_data);
         } catch (error: any) {
-            setUploadError('Service Unavailable. Please contact admin.');
+            console.log(error)
+            setUploadError('Service Unavailable. Please contact admin.')
             return { success: 0 }
         } finally {
-            setUploading(false);
+            setUploading(false)
         }
     };
 
@@ -130,15 +103,10 @@ const ImageUpload = () => {
                 e.target.value = ''
             }
         }
-    };
-
-    // const handlePlanSelection = () => {
-    //     // setShowPaywall(false);
-    //     setShowInsights(true);
-    // };
+    }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500">
+        <>
             <div className="flex justify-end p-4 space-x-4">
                 <button
                     type="button"
@@ -258,7 +226,7 @@ const ImageUpload = () => {
                     style={{ top: '65%', left: '70%' }}
                 />
             </div>
-        </div>
+        </>
     )
 }
 

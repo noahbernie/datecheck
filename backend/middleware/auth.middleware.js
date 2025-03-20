@@ -39,10 +39,8 @@ async function protectedRoute(req, res, next) {
  */
 async function getJWT(token) {
     let secretOrKey = process.env.JWT_SECRET || ''
-    console.log(secretOrKey)
     const decodedToken = jwt.decode(token)
     let user = await User.findOne({ _id: decodedToken.id }, 'jwtSecret')
-    console.log(user)
     const jwtSecret = _.get(user, 'jwtSecret', false)
     if (jwtSecret) {
         secretOrKey = jwtSecret

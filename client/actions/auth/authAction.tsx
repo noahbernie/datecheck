@@ -1,11 +1,14 @@
-import { authUser, setShowAuth, setShowPaywall } from '../../src/reducer/authSlice'
+import { NavigateFunction, useNavigate } from 'react-router-dom'
+import { authUser } from '../../src/reducer/authSlice'
+// import { storeUserFaceMatches } from './userFaceMatchesAction'
+import { navigateTo } from '../../utils/navigateHelper'
 import { getBaseUrl } from '../api'
 const BASE_URL = getBaseUrl()
 
 // Get current user details
 export const getCurrentUserDetails = (callback?: () => void) => async (dispatch: any) => {
+    // const state = store.getState()
     if (!localStorage.getItem('authToken')) {
-        // dispatch(setIsProfileReadyAction())
         if (callback) {
             callback()
         }
@@ -26,16 +29,19 @@ export const getCurrentUserDetails = (callback?: () => void) => async (dispatch:
         }
 
         const result = await response.json()
-
         // Dispatch user update action
-        dispatch(authUser(result.data))
-        dispatch(setShowAuth(false))
-        dispatch(setShowPaywall(true))
+        const updatedData = { id: result.data._id, ...result.data }
+        delete updatedData._id
+        dispatch(authUser(updatedData))
+        if (result.data.plan_status === 'active') {
+            // dispatch(storeUserFaceMatches(state.userFaceMatches.userFaceMatches, result.data._id))
+            navigateTo('/insight')
+        } else {
+            navigateTo('/subscribe')
+        }
     } catch (error) {
-        // dispatch(handleUserUpdateError(error))
         console.log(error)
     } finally {
-        console.log('inside finnally')
         if (callback) {
             callback()
         }
