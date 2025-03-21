@@ -12,6 +12,7 @@ import { configureStore } from '@reduxjs/toolkit'
 // } from 'redux-persist'
 // import storage from 'redux-persist/lib/storage' // Uses localStorage
 import authReducer from './authSlice'
+import userFaceMatche from './userImageFaceMatches'
 
 // import { combineReducers } from 'redux'
 // import { PersistConfig } from 'redux-persist/es/types'
@@ -22,7 +23,8 @@ import authReducer from './authSlice'
 
 const store = configureStore({
     reducer: {
-        auth: authReducer, // ✅ Ensure it's inside `auth`
+        auth: authReducer,
+        userFaceMatches: userFaceMatche
     }
 })
 

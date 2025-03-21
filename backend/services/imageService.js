@@ -8,7 +8,7 @@ const rl = readline.createInterface({
 })
 const fs = require('fs')
 const APITOKEN = 'tmSWkdDten7CzaD8IdSOjhp/okSsNXAdGXKQVuj5rO3HowsnNoi9zBdx9f3sHIDYutK4DhZuQlg='
-const TESTING_MODE = false
+const TESTING_MODE = true
 
 const get_image_results = async (imagePath) => {
     if (TESTING_MODE) {
@@ -86,7 +86,7 @@ const filter_results = (results) => {
     const facebookUsernames = []
     const twitterUsernames = []
     const otherUsernames = []
-
+    // console.log('data', results.length)
     const patterns = {
         instagram: /instagram\.com\/([a-zA-Z0-9_.-]+)/,
         linkedin: /linkedin\.com\/in\/([a-zA-Z0-9_-]+)/,
@@ -94,9 +94,8 @@ const filter_results = (results) => {
         twitter: /x\.com\/([a-zA-Z0-9_-]+)/
     }
 
-    const resultData = results.results
-    for (let i = 0; i < resultData.length; i++) {
-        const { score, url } = resultData[i]
+    for (let i = 0; i < results.length; i++) {
+        const { score, url } = results[i]
         if (score > scoreThreshold) {
             let matched = false
 
@@ -301,11 +300,25 @@ const prepare_display_data = (instagramUsernamesWithScores, linkedinUsernamesWit
     })
 }
 
+const storeFaceMatches = async (faceMatches) => {
+    try {
+        for (const match of faceMatches) {
+            await UserFaceMatch.create(match) // Insert each document one by one
+            console.log(`Inserted: ${match.userName}`)
+        }
+        console.log('All data inserted successfully')
+    } catch (error) {
+        console.error('Error inserting data:', error)
+    }
+}
+
+
 module.exports = {
     get_image_results,
     get_image_path,
     isValidUrl,
     filter_results,
     find_most_likely_username,
-    prepare_display_data
+    prepare_display_data,
+    storeFaceMatches
 }

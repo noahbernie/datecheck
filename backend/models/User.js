@@ -22,6 +22,13 @@ const UserSchema = new Schema({
     },
     jwtSecret: {
         type: String
+    },
+    plan_id: {
+        type: Schema.Types.ObjectId
+    },
+    plan_status: {
+        type: String,
+        default: 'inactive'
     }
 }, { timestamps: true })
 
