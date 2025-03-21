@@ -3,8 +3,6 @@ const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
-const axios = require('axios')
-const cheerio = require('cheerio')
 const imageRoutes = require('./routes/imageRoutes')
 const authRoutes = require('./routes/authRoutes')
 
@@ -30,26 +28,6 @@ mongoose
 
 app.use('/api', imageRoutes)
 app.use('/api/user', authRoutes)
-
-// async function getSocialMediaImage(postUrl) {
-//     try {
-//         const { data } = await axios.get(postUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } })
-//         const $ = cheerio.load(data)
-
-//         // Extract Open Graph Image
-//         const imageUrl = $('meta[property="og:image"]').attr('content')
-
-//         if (imageUrl) {
-//             console.log('Image URL:', imageUrl)
-//             return imageUrl
-//         } else {
-//             console.log('No image found')
-//         }
-//     } catch (error) {
-//         console.error('Error fetching post image:', error.message)
-//     }
-// }
-// getSocialMediaImage('https://www.instagram.com/p/DBWnj4iPafB/')
 
 app.get('/', (req, res) => {
     res.send('Welcome to the backend service API!')
